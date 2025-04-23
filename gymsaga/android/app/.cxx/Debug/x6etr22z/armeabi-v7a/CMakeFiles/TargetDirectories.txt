@@ -1,0 +1,2 @@
+C:/Users/lenovo/Desktop/UAS MOBILE 2025/MobileApp_GymSaga/gymsaga/android/app/.cxx/Debug/x6etr22z/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/lenovo/Desktop/UAS MOBILE 2025/MobileApp_GymSaga/gymsaga/android/app/.cxx/Debug/x6etr22z/armeabi-v7a/CMakeFiles/rebuild_cache.dir

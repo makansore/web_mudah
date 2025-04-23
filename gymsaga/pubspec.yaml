@@ -1,0 +1,37 @@
+name: gymsaga
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  loading_indicator: ^3.1.0
+  fl_chart: ^0.63.0
+  intl: ^0.17.0
+  http: ^1.3.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/widgets/background/
+    - assets/widgets/buttons/
+    - assets/widgets/icons/
+    - assets/widgets/images/
+    - assets/widgets/buttons/profile.png
+    - assets/widgets/buttons/homepage_pressed.png
+
+  fonts:
+    - family: Jersey25
+      fonts:
+        - asset: assets/fonts/Jersey25.ttf
