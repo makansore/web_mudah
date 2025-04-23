@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'login.dart';
-import 'completeyourprofile.dart'; // Make sure this matches the filename
-//
+import 'completeyourprofile.dart';
+import 'homepage.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -14,7 +17,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _rememberMe = false;
   bool _isPasswordVisible = false;
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -26,44 +28,138 @@ class _RegisterPageState extends State<RegisterPage> {
     return _emailRegex.hasMatch(email);
   }
 
-  Future<void> _handleSignUp() async {
+  // GOOGLE SIGN-IN
+  Future<void> signUpWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        print('Google sign-in aborted');
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        print('Google Sign-Up successful: ${user.email}');
+
+        // Kirim data ke backend Django
+        final response = await http.post(
+          Uri.parse('http://10.0.2.2:8000/api/register/'),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            'email': user.email,
+            'username': user.displayName,
+            'google_uid': user.uid,
+            'method': 'google_login',
+          }),
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const CompleteYourProfile()),
+          );
+        } else {
+          final responseData = jsonDecode(response.body);
+          if (responseData['error'] == 'Email is already in use') {
+            // Kalau user udah pernah login dengan Google → langsung ke Home
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          } else {
+            print("Gagal menyimpan ke backend: ${response.body}");
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Failed to register via Google")),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      print('Google Sign-In Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Google Sign-In Failed")),
+      );
+    }
+  }
+
+  // EMAIL + PASSWORD REGISTRATION
+  Future<void> registerUser() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isNotEmpty && password.isNotEmpty && _isValidEmail(email)) {
-      final url = Uri.parse('http://10.10.169.150:8000/auth/users/');
-
-      final Map<String, dynamic> requestBody = {
-        'email': email,
-        'password': password,
-      };
-
       try {
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(requestBody),
+        // Daftar ke Firebase Authentication dulu
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
         );
 
-        if (response.statusCode == 201) {
-          // Extract the token from the response
-          final Map<String, dynamic> responseBody = jsonDecode(response.body);
-          final String token = responseBody['token'] ??
-              ''; // Adjust based on actual response structure
+        final User? user = userCredential.user;
 
-          // Proceed to Complete Your Profile screen
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  CompleteYourProfile(token: token), // Pass the token
-            ),
+        if (user != null) {
+          print(
+              'Firebase email/password signup berhasil: ${user.email}, UID: ${user.uid}');
+
+          // Kirim data ke backend Django
+          const String apiUrl = 'http://10.0.2.2:8000/api/register/';
+          final response = await http.post(
+            Uri.parse(apiUrl),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              'username': email,
+              'email': email,
+              'password': password,
+              'email_uid': user.uid,
+              'method': 'email_login',
+            }),
           );
-        } else {
-          final Map<String, dynamic> responseBody = jsonDecode(response.body);
-          _showErrorDialog(responseBody.toString());
+
+          if (response.statusCode == 201 || response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            print("Berhasil daftar dan simpan ke Django: $data");
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CompleteYourProfile(),
+              ),
+            );
+          } else {
+            final data = jsonDecode(response.body);
+            print("Gagal simpan ke backend: $data");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(data['error'] ?? 'Registration failed')),
+            );
+          }
         }
+      } on FirebaseAuthException catch (e) {
+        print('Firebase Auth error: ${e.message}');
+        String errorMsg = 'Registration failed';
+        if (e.code == 'email-already-in-use') {
+          errorMsg = 'Email is already in use';
+        } else if (e.code == 'weak-password') {
+          errorMsg = 'Password is too weak';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg)),
+        );
       } catch (e) {
-        _showErrorDialog('Failed to connect to server.');
+        print('Error saat registrasi: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration error')),
+        );
       }
     } else {
       _showErrorDialog('Please enter a valid email and password.');
@@ -244,7 +340,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 70),
               Center(
                 child: InkWell(
-                  onTap: _handleSignUp,
+                  onTap: registerUser,
                   child: Container(
                     height: 50,
                     width: 240,
@@ -269,9 +365,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 10),
               Center(
                 child: InkWell(
-                  onTap: () {
-                    // Add Google sign-in logic if needed
-                  },
+                  onTap: signUpWithGoogle,
                   child: Container(
                     height: 50,
                     width: 240,

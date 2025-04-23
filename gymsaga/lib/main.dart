@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gymsaga/achievement.dart';
 import 'package:gymsaga/login.dart';
@@ -6,7 +7,17 @@ import 'package:gymsaga/register.dart';
 import 'package:gymsaga/homepage.dart';
 import 'package:gymsaga/steps.dart';
 import 'package:gymsaga/workout.dart';
-void main() {
+import 'package:gymsaga/loadingpage.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Cek apakah Firebase sudah diinisialisasi
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   runApp(const MainApp());
 }
 
@@ -68,7 +79,6 @@ class MainApp extends StatelessWidget {
             default:
               page = const HomePage();
           }
-
           return PageRouteBuilder(
             settings: settings,
             pageBuilder: (_, __, ___) => page,
@@ -76,7 +86,6 @@ class MainApp extends StatelessWidget {
             reverseTransitionDuration: Duration.zero,
           );
         }
-
         // Kembalikan null untuk menggunakan route default
         return null;
       },

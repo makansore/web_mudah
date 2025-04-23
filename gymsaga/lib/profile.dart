@@ -26,7 +26,6 @@ class ProfilePage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-
             // Background Header Image (fixed at the top)
             Positioned(
               top: 0,
@@ -37,7 +36,6 @@ class ProfilePage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-
             // Centered "PROFILE" Text
             Positioned(
               top: 24, // adjust vertically as needed
@@ -78,7 +76,6 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
             ),
-
             // Gear Icon on the right
             Positioned(
               top: 32, // same vertical as text for alignment
@@ -128,20 +125,10 @@ class ProfilePage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const EditProfilePage(),
-                              ),
-                            );
-                          },
-                          child: Image.asset(
-                            'assets/widgets/buttons/edit_button.png',
-                            width: 28,
-                            height: 28,
-                          ),
+                        Image.asset(
+                          'assets/widgets/buttons/edit_button.png',
+                          width: 28,
+                          height: 28,
                         ),
                       ],
                     ),
@@ -159,18 +146,8 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ProfileButton(
-                    label: 'My Weight',
-                    icon: Icons.monitor_weight,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MyWeightPage(),
-                        ),
-                      );
-                    },
-                  ),
+                  const ProfileButton(
+                      label: 'My Weight', icon: Icons.monitor_weight),
                   ProfileButton(
                     label: 'Workout History',
                     icon: Icons.fitness_center,
@@ -183,18 +160,8 @@ class ProfilePage extends StatelessWidget {
                       );
                     },
                   ),
-                  ProfileButton(
-                    label: 'Statistics',
-                    icon: Icons.show_chart,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const StatCaloriesPage(),
-                        ),
-                      );
-                    },
-                  ),
+                  const ProfileButton(
+                      label: 'Statistics', icon: Icons.show_chart),
                   const ProfileButton(
                       label: 'Achievements', icon: Icons.emoji_events),
                   const SizedBox(height: 80), // Extra space for navbar
@@ -212,7 +179,6 @@ class ProfilePage extends StatelessWidget {
 class ProfileStat extends StatelessWidget {
   final String label;
   final String value;
-
   const ProfileStat({super.key, required this.label, required this.value});
 
   @override

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "187969799744",
+    "project_id": "gymsagabackup",
+    "storage_bucket": "gymsagabackup.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187969799744:android:4476ceaf448808c94a41a5",
+        "android_client_info": {
+          "package_name": "com.example.gymsaga"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "187969799744-qig28bk2bodc5b6c1l8n8dtni1dtvjka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gymsaga",
+            "certificate_hash": "756ca6fd4f5213245477a22e976daf06932f8a25"
+          }
+        },
+        {
+          "client_id": "187969799744-0t0t67pmcm5ou1data04n9nl74239dih.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa2T6_ybltlZirZx-t7qGKr10xm25YpDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "187969799744-0t0t67pmcm5ou1data04n9nl74239dih.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymsaga/login.dart';
-import 'homepage.dart'; // Make sure to import your HomePage
+import 'homepage.dart';
 
 class FinishSettingUp extends StatelessWidget {
   const FinishSettingUp({Key? key}) : super(key: key);
@@ -42,11 +42,11 @@ class FinishSettingUp extends StatelessWidget {
                 Center(
                   child: InkWell(
                     onTap: () {
-                      // Use pushAndRemoveUntil to clear all previous routes
-                      Navigator.pushAndRemoveUntil(
+                      // Updated navigation to directly push to HomePage
+                      Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                        (route) => false, // Remove all previous routes
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
                       );
                     },
                     child: Container(
